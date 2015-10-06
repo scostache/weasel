@@ -1,0 +1,7 @@
+include MANIFEST.in
+include install/*
+recursive-include client/*
+recursive-include datastore/*
+recursive-include resourcemng/*
+recursive-include utils/*
+recursive-include worker/* 

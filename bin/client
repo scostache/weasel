@@ -1,0 +1,62 @@
+#!/usr/bin/python
+import sys
+import getopt
+
+import weasel.utils.argparse as argparse
+from weasel.client.client import Client
+
+def queue(args):
+	print args
+	address = args.address
+	if args.command == "" and args.file == "":
+		print "Error in specifying submission parameters. Will abort."
+		return
+	elif len(args.command) > 0:
+		client = Client(address)
+		client.queue(args.command)
+	elif len(args.file) > 0:
+		client = Client(address)
+		client.queue_file(args.file)
+	
+	
+def status(args):
+	client = Client(args.address)
+	client.status(args.id)
+
+def waitall(args):
+	print "Creating client class..."
+	client = Client(args.address)
+	client.waitall(args.id)
+	
+def kill(args):
+	client = Client(args.address)
+	client.kill(args.id)
+
+parser = argparse.ArgumentParser(add_help=True, \
+				description='client : \
+				submits and gets info about applications')
+subparsers = parser.add_subparsers(help='commands')
+
+queue_parser = subparsers.add_parser('queue', help='queues commands')
+queue_parser.add_argument('-c', "--command", default="", action='store', help='command to be queued')
+queue_parser.add_argument('-f', "--file", default="", action='store', help='a batch of commands to be queued')
+queue_parser.add_argument('-a', "--address", default="localhost:5555", action='store', help='address to contact')
+queue_parser.set_defaults(func=queue)
+
+status_parser = subparsers.add_parser('status', help='Gets the status/output of the commands')
+status_parser.add_argument('-i', "--id", default="", action='store', help='Application ID')
+status_parser.add_argument('-a', "--address", default="localhost:5555", action='store', help='address to contact')
+status_parser.set_defaults(func=status)
+
+status_parser = subparsers.add_parser('waitall', help='Waits all of the commands to finish')
+status_parser.add_argument('-i', "--id", default="", action='store', help='Application ID')
+status_parser.add_argument('-a', "--address", default="localhost:5555", action='store', help='address to contact')
+status_parser.set_defaults(func=waitall)
+
+kill_parser = subparsers.add_parser('kill', help='Kills a worker')
+kill_parser.add_argument('-a', "--address", default="localhost:5555", action='store', help='address to contact')
+kill_parser.add_argument('-i', "--id", default="", action='store', help='Worker ID')
+kill_parser.set_defaults(func=kill)
+
+results = parser.parse_args()
+results.func(results)

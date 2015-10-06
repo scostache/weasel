@@ -1,0 +1,34 @@
+#!/usr/bin/python
+
+import sys
+import signal
+import traceback
+import weasel
+from weasel.utils.daemon import Daemon
+from weasel.worker.worker_plugins import schedulers_dict
+import weasel.etc.config as config
+
+
+is_daemon = False
+ps = None
+
+def signal_handler(signal, frame):
+    if ps == None:
+        print "Scheduler is not started!"
+        return
+    ps.shutdown(None)
+    
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+try:
+    ps = schedulers_dict[config.POLICY]()
+except:
+    traceback.print_exc()
+    print "No policy implemented for ", config.POLICY
+    sys.exit(1)
+
+if is_daemon == True:
+    Daemon(ps)
+    
+ps.run()
