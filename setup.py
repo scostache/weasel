@@ -3,10 +3,10 @@ from distutils.core import setup
 
 setup(name = "Weasel",
     version = "0-1",
-    description = "MTC Platform",
+    description = "MTC Scheduler",
     author = "Stefania Costache",
     author_email = "stefania.costache@gmail.com",
-    url = "https://gforge.inria.fr/",
+    url = "https://github.com/scostache/weasel/",
     platform = "Linux Debian",
     #Name the folder where your packages live:
     #(If you have other packages (dirs) or modules (py files) then
@@ -16,7 +16,6 @@ setup(name = "Weasel",
 		'weasel.utils', 
 		'weasel.resourcemng', \
 		'weasel.etc', \
-		'weasel.datastore', \
 		'weasel.client', \
 		'weasel.worker']
     data_files=[],
@@ -29,5 +28,5 @@ setup(name = "Weasel",
     scripts = ["bin/client", \
 		"bin/resourcemng", \
 		"bin/local_resourcemng"],
-   long_description = """ Weasel is a set of tools to manage Many Tasks Computing applications on clusters and clouds """
+   long_description = """ Weasel is a scheduler for Many Tasks Computing applications """
 )
