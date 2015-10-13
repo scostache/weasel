@@ -41,7 +41,8 @@ class Client(object):
         context = zmq.Context()
         mysocket = tmp_socket(context, zmq.DEALER, self.identity,
                               SCHEDULER + ":" + str(ZMQ_SCHEDULER_PORT))
-        f = open(file, 'r')
+        app_id = 0
+	f = open(file, 'r')
         line = f.readline()
         string_to_send = {}
         max_to_send = 100
@@ -70,7 +71,7 @@ class Client(object):
 		if current_hash == previous_hash:
 		    task_list.append(string_to_send.copy())
 		#print "Sending tasks for appId: ", previous_hash, "task exec: ", string_to_send['exec']
-		if current_to_send == max_to_send or line == None or current_hash != previous_hash:
+		if current_to_send == max_to_send or not line or current_hash != previous_hash:
 		    current_to_send = 0
                     data = pickle.dumps(task_list)
                     app_id = previous_hash #hashlib.sha1(string_to_send['exec']).hexdigest()
