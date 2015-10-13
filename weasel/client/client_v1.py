@@ -1,5 +1,7 @@
 import socket
 import uuid
+import pickle
+import hashlib
 from weasel.etc.config import *
 from weasel.utils.notification import *
 
@@ -36,14 +38,31 @@ class Client(object):
         
     def queue_file(self, file):
 	''' queues all commands from a given file '''
-	app_id =  uuid.uuid1()
 	context = zmq.Context()
 	mysocket = tmp_socket(context, zmq.DEALER, self.identity, \
                                 SCHEDULER+":"+str(ZMQ_SCHEDULER_PORT))
 	f = open(file, 'r')
-	for line in f:
-		message = [str(app_id), '', PROTOCOL_HEADERS['CLIENT'], 'queue', line]
+	line = f.readline()
+	string_to_send = {}
+	while line:
+	    tokens = line.split('=')
+	    inputval = tokens[0]
+	    tmpval = tokens[1][:-1]
+	    if inputval == 'exec':
+		paramval = ""
+		for token in tokens[1:]:
+		    paramval = paramval + token
+		tmpval = paramval[:-1]
+	    string_to_send[inputval] = tmpval
+	    if inputval == 'outputs':
+		print string_to_send
+		data = pickle.dumps(string_to_send)
+		app_id = hashlib.sha1(string_to_send['exec']).hexdigest()
+		message = [str(app_id), '', PROTOCOL_HEADERS['CLIENT'], 'queue', data]
         	send_message(mysocket, message)
+		string_to_send = {}
+	    line = f.readline()
+	f.close()
 	mysocket.close()
         context.term()       
 	print "Your Application ID is : ", app_id
